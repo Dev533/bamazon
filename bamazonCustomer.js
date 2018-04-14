@@ -11,12 +11,15 @@ var connection = mysql.createConnection({
 });
  
 connection.connect();
- /*
+ 
 connection.query('SELECT * FROM products', function (error, results, fields) {
   if (error) throw error;
-  console.log(results);
+    console.log()
+  for (var i = 0; i < results.length; i++) {
+    console.log(results[i].item_id + " - " + results[i].product_name + " / " + results[i].department_name + " / $ " + results[i].price)
+  }
 });
- */
+ 
 //connection.end();
 
 function selectFrom() {
@@ -41,29 +44,42 @@ inquirer.prompt ([
     {
         type: 'type',
         name: 'item_id',
-        message: 'Which item would you like?'
+        message: 'Which item would you like? (Please enter the id number.)'
     }
 ]).then (function (answer) {
     //console.log(answer)
     var select = 'SELECT * FROM products WHERE item_id = ?'
-    var mode = answer.item_id
+    var item_id = answer.item_id
     //console.log(mode);
     //console.log(select);
-    connection.query(select, mode, function(err,res) {
+    connection.query(select, item_id, function(err,res) {
         if (err) throw err;
-        console.log(res[0].product_name)
-        console.log(res[0].department_name)
-        console.log(res[0].price)
+       var price = res[0].price;
+       var quantity = res[0].stock_quantity
+      
         inquirer.prompt([
             {
                 type: 'type',
                 name: 'stock_quantity',
                 message: 'How many would you like?'
-            }.then (function (answer) {
-                // var available = 
+            }]).then (function (answer) {
+                var givenQuantity = parseInt(answer.stock_quantity);
+                console.log(" Order Total $ " + parseInt(answer.stock_quantity) * parseInt(price))
+                inquirer.prompt([
+                    {
+                        type: 'type',
+                        name: 'stock_quantity',
+                        message: 'Place order? Y or N'
+                    }]).then (function (answer) {
+                        if (givenQuantity <= quantity) {
+                            console.log('Thanks for placing your order.')
+                        } 
+                        else {
+                            console.log('We apologize. We do not have enough of that item at this time. Please place another order.')
+                        }
+                        
+                    })
             })
-        
-        ])
     })
 })
 
