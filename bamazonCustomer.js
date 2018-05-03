@@ -30,13 +30,14 @@ function selectFrom() {
     })
 }
 
-/* PSEUDO CODE: In the inquirer prompt below, I need to add something that provides a list of the items to choose from so that the user can know what they are choosing when they enter one of the item_ids 1 - 10. 
+/* PSEUDO CODE: Now I just need to code in the following...
 
-Currently, if someone chooses a number from 1 through 10, it will return an item. At least this part of the app is working.
+However, if your store does have enough of the product, you should fulfill the customer's order.
 
-I am getting an error after it returns the item, so I need to figure out that bug.
+This means updating the SQL database to reflect the remaining quantity.
+Once the update goes through, show the customer the total cost of their purchase.
 
-Then, I need code prompting the customer the second question of how many units they want of the item. Then, I need to code a subtraction of the amount the user wants to order from the inventory amount.
+The customer's order is being fulfilled as far as the console log response goes, but I need to code in the subtractions from the stock quantity and logging the new total.
 
 */
 
@@ -56,7 +57,8 @@ inquirer.prompt ([
         if (err) throw err;
        var price = res[0].price;
        var quantity = res[0].stock_quantity
-      
+       var id = res[0].item_id
+
         inquirer.prompt([
             {
                 type: 'type',
@@ -73,6 +75,11 @@ inquirer.prompt ([
                     }]).then (function (answer) {
                         if (givenQuantity <= quantity) {
                             console.log('Thanks for placing your order.')
+                            var newQuantity = quantity - givenQuantity
+                            connection.query("update products SET stock_quantity = " + newQuantity + " WHERE item_id = " + id, function(err, res) {
+                                if(err) throw err
+                                console.log("Your order is being processed...")
+                            } )
                         } 
                         else {
                             console.log('We apologize. We do not have enough of that item at this time. Please place another order.')
